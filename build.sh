@@ -44,6 +44,15 @@ module B = Internal_modules_of_b.Lib
    code. To prevent this, the module containing all private modules of this
    package is shadowed here. *)
 module Internal_modules_of_b = struct end
+[@@deprecated "This module is an empty shadow of another module intended for internal use only."]
+
+(* Also shadow this package's public interface. This will prevent client code
+   from accessing this package's contents by referring to the public interface
+   directly. This isn't strictly needed for correctness but it lets us force
+   client code to only access the package by its module aliased at the top of
+   this file. *)
+module Public_interface_to_open_of_b = struct end
+[@@deprecated "This module is an empty shadow of another module intended for internal use only."]
 
 (* Shadow the internal modules of the transitive closure of this package. When
    compiling modules from packages that depend on this package, the public
@@ -56,6 +65,7 @@ module Internal_modules_of_b = struct end
    open the modules necessary to shadow the internal modules of each package in
    its transitive closure. Thus they must be shadowed again here. *)
 module Internal_modules_of_a = struct end
+[@@deprecated "This module is an empty shadow of another module intended for internal use only."]
 
 (* Shadow the public interfaces to the transitive closure of this package. As
    described above, all the public directories of this package's transitive
@@ -64,6 +74,7 @@ module Internal_modules_of_a = struct end
    this package's dependency closure. To prevent this, the public interfaces to
    each package in this package's dependency closure is shadowed here. *)
 module Public_interface_to_open_of_a = struct end
+[@@deprecated "This module is an empty shadow of another module intended for internal use only."]
 EOF
 ocamlopt.opt $FLAGS -I b_pub -c b_pub/public_interface_to_open_of_b.ml
 ocamlopt.opt $FLAGS -a b_pub/internal_modules_of_b.cmx b_pub/public_interface_to_open_of_b.cmx -o b_pub/lib.cmxa
@@ -101,11 +112,14 @@ cat > d_pub/public_interface_to_open_of_d.ml <<EOF
 module D = Internal_modules_of_d.Lib
 
 module Internal_modules_of_d = struct end
+module Public_interface_to_open_of_d = struct end
 
 module Internal_modules_of_a = struct end
 module Internal_modules_of_b = struct end
 
 module Public_interface_to_open_of_a = struct end
+[@@deprecated "this module is for internal use only"]
+
 module Public_interface_to_open_of_b = struct end
 EOF
 ocamlopt.opt $FLAGS -I d_pub -c d_pub/public_interface_to_open_of_d.ml
